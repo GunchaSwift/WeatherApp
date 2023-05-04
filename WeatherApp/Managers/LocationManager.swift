@@ -48,7 +48,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     // This tells delegate that new location data is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         // New location data is available!
-        location = locations.first?.coordinate
+        location = locations.last?.coordinate
         isLoading = false
         manager.stopUpdatingLocation()
     }

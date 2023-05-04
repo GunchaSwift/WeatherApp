@@ -10,6 +10,7 @@ import SwiftUI
 struct WeatherView: View {
     @State var weather: ResponseBody
     var weatherManager = WeatherManager()
+    var locationManager = LocationManager()
     
     var body: some View {
             ZStack(alignment: .leading) {
@@ -25,9 +26,14 @@ struct WeatherView: View {
                         
                         // Refresh the current weather data
                         Button {
+                            // Fetch new current location of the user
+                            locationManager.manager.startUpdatingLocation()
                             Task {
                                 do {
-                                    weather = try await weatherManager.getCurrentWeather(latitude: weather.coord.lat, longitude: weather.coord.lon)
+                                    // Fetch new current weather data
+                                    weather = try await weatherManager.getCurrentWeather(latitude: locationManager.location?.latitude ?? 50.2020, longitude: locationManager.location?.longitude ?? 14.2020)
+                                    // Stop fetching current location of the user
+                                    locationManager.manager.stopUpdatingLocation()
                                 } catch {
                                     print("Error getting the weather: \(error)")
                                 }
