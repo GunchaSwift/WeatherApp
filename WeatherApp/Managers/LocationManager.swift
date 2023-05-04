@@ -16,13 +16,6 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     override init() {
         super.init()
         manager.delegate = self
-        
-        // TODO: Request permission from the use (Me Travel app) - REMOVE THIS LINE AFTER ONBOARDING IS COMPLETED!
-        isLoading = true
-        manager.startUpdatingLocation()
-        print("Starting updating location...")
-        manager.requestWhenInUseAuthorization()
-        print("Requested when in use authorization...")
     }
     
     // Location-related properties and methods
@@ -31,34 +24,36 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var isLoading = false
     @Published var errorMessage = ""
     
+    // Request location func that is called when pressing button in WelcomeView, when user hasn't authorized usage of location yet.
     func requestLocation() {
         isLoading = true
-        manager.startUpdatingLocation()
-        print("Starting updating location...")
         manager.requestWhenInUseAuthorization()
-        print("Requested when in use authorization...")
-        // manager.requestLocation()
     }
     
+    // This method is called either when locationManager instance is created or when the app's authorization status changes.
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         if manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse {
-            // We have permission
+            // We have permission, set it
             authorizationState = manager.authorizationStatus
             
-            // TODO: Start locating
+            // Start locating
+            isLoading = true
+            manager.startUpdatingLocation()
         } else if manager.authorizationStatus == .denied {
             // We don't have permission
+            // TODO: Handle this
         }
     }
     
+    // This tells delegate that new location data is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        // New location data is available
+        // New location data is available!
         location = locations.first?.coordinate
         isLoading = false
         manager.stopUpdatingLocation()
-        print("Stopped updating location!")
     }
     
+    // This tells the delegate that the location manager was unable to retrieve a location value.
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         errorMessage = error.localizedDescription
         print(error.localizedDescription)

@@ -8,96 +8,131 @@
 import SwiftUI
 
 struct WeatherView: View {
-    var weather: ResponseBody
+    @State var weather: ResponseBody
+    var weatherManager = WeatherManager()
     
     var body: some View {
-        ZStack(alignment: .leading) {
-            VStack {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(weather.name)
-                        .bold().font(.title)
-                    Text("Today, \(Date().formatted(.dateTime.month().day().hour().minute()))")
-                        .fontWeight(.light)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Spacer()
-                
+            ZStack(alignment: .leading) {
                 VStack {
                     HStack {
-                        VStack(spacing: 20) {
-                            Image(systemName: "cloud")
-                                .font(.system(size: 40))
-                            
-                            Text(weather.weather[0].main)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(weather.name)
+                                .bold().font(.title)
+                            Text("Today, \(Date().formatted(.dateTime.month().day().hour().minute()))")
+                                .fontWeight(.light)
                         }
-                        .frame(width: 150, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        Spacer()
-                        
-                        Text(weather.main.feelsLike.roundDouble() + "°")
-                            .font(.system(size: 100))
-                            .fontWeight(.bold)
-                            .padding()
+                        // Refresh the current weather data
+                        Button {
+                            Task {
+                                do {
+                                    weather = try await weatherManager.getCurrentWeather(latitude: weather.coord.lat, longitude: weather.coord.lon)
+                                } catch {
+                                    print("Error getting the weather: \(error)")
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.clockwise.icloud")
+                                .font(.title2.bold())
+                                .foregroundColor(.white)
+                            
+                        }
+                        .padding(.trailing, 5)
+
                     }
                     
                     Spacer()
-                        .frame(height: 80)
                     
-                    AsyncImage(url: URL(string: "https://cdn.pixabay.com/photo/2020/01/24/21/33/city-4791269_960_720.png")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 350)
-                    } placeholder: {
-                        ProgressView()
-                    }
-                    
-                    Spacer()
-                    
-                    // TODO: Continue lower part of UI
-                    Text("TODO: Continue lower par of UI")
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            VStack {
-                Spacer()
-                
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Weather now")
-                        .bold().padding(.bottom)
-                    
-                    HStack {
-                        VStack(alignment: .leading) {
-                            WeatherRow(logo: "thermometer", name: "Min temp", value: (weather.main.tempMin.roundDouble() + "°"))
+                    VStack {
+                        HStack {
+                            VStack(spacing: 20) {
+                                // Dynamic icon for current weather condition.
+                                switch weather.weather[0].main {
+                                case "Clouds":
+                                    Image(systemName: "cloud")
+                                        .font(.system(size: 40))
+                                case "Rain":
+                                    Image(systemName: "cloud.rain")
+                                        .font(.system(size: 40))
+                                case "Snow":
+                                    Image(systemName: "cloud.snow")
+                                        .font(.system(size: 40))
+                                case "Clear":
+                                    Image(systemName: "sun.max")
+                                        .font(.system(size: 40))
+                                default:
+                                    Image(systemName: "sun.max")
+                                        .font(.system(size: 40))
+                                }
+                                
+                                Text(weather.weather[0].main)
+                            }
+                            .frame(width: 150, alignment: .leading)
                             
-                            WeatherRow(logo: "wind", name: "Wind speed", value: (weather.wind.speed.roundDouble() + "m/s"))
+                            Spacer()
+                            
+                            Text(weather.main.feelsLike.roundDouble() + "°")
+                                .font(.system(size: 100))
+                                .fontWeight(.bold)
+                                .padding()
                         }
                         
                         Spacer()
+                            .frame(height: 80)
                         
-                        VStack(alignment: .leading) {
-                            WeatherRow(logo: "thermometer", name: "Max temp", value: (weather.main.tempMax.roundDouble() + "°"))
-                            
-                            WeatherRow(logo: "humidity", name: "Humidity", value: (weather.main.humidity.roundDouble() + "%"))
+                        AsyncImage(url: URL(string: "https://cdn.pixabay.com/photo/2020/01/24/21/33/city-4791269_960_720.png")) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 350)
+                        } placeholder: {
+                            ProgressView()
                         }
+                        
+                        Spacer()
                     }
-                    .padding([.horizontal, .bottom])
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
-                .padding(.bottom, 20)
-                .foregroundColor(Color(hue: 0.599, saturation: 0.707, brightness: 0.415))
-                .background(.white)
-                .cornerRadius(20, corners: [.topLeft, .topRight])
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                VStack {
+                    Spacer()
+                    
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text("Weather now")
+                            .bold().padding(.bottom)
+                        
+                        HStack {
+                            VStack(alignment: .leading) {
+                                WeatherRow(logo: "thermometer", name: "Min temp", value: (weather.main.tempMin.roundDouble() + "°"))
+                                
+                                WeatherRow(logo: "wind", name: "Wind speed", value: (weather.wind.speed.roundDouble() + "m/s"))
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .leading) {
+                                WeatherRow(logo: "thermometer", name: "Max temp", value: (weather.main.tempMax.roundDouble() + "°"))
+                                
+                                WeatherRow(logo: "humidity", name: "Humidity", value: (weather.main.humidity.roundDouble() + "%"))
+                            }
+                        }
+                        .padding([.horizontal, .bottom])
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .padding(.bottom, 20)
+                    // TODO: Dynamic background color for current time of the day and/or weather condition.
+                    .foregroundColor(Color(hue: 0.599, saturation: 0.707, brightness: 0.415))
+                    .background(.white)
+                    .cornerRadius(20, corners: [.topLeft, .topRight])
+                }
             }
-        }
-        .edgesIgnoringSafeArea(.bottom)
-        .background(Color(hue: 0.599, saturation: 0.707, brightness: 0.415))
-        .preferredColorScheme(.dark)
+            .edgesIgnoringSafeArea(.bottom)
+            .background(Color(hue: 0.599, saturation: 0.707, brightness: 0.415))
+            .preferredColorScheme(.dark)
     }
 }
 

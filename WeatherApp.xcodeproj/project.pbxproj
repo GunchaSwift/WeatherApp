@@ -480,6 +480,7 @@
 				DEVELOPMENT_TEAM = UL7NN3WF47;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WeatherBerry;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We want to show you weather information at your current location";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to show you weather information at your current location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -512,6 +513,7 @@
 				DEVELOPMENT_TEAM = UL7NN3WF47;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WeatherBerry;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We want to show you weather information at your current location";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to show you weather information at your current location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

@@ -18,9 +18,8 @@ struct ContentView: View {
             if locationManager.authorizationState == .notDetermined {
                 // We don't have authorization yet
                 let _ = print("We don't have authorization yet")
-                // TODO: Show onboarding and then ask for permission (currently asking for permission at launch!)
-                Color(hue: 0.599, saturation: 0.707, brightness: 0.415)
-                    .ignoresSafeArea()
+                WelcomeView()
+                    .environmentObject(locationManager)
             } else if locationManager.authorizationState == .authorizedAlways || locationManager.authorizationState == .authorizedWhenInUse {
                 // We have authorization
                 let _ = print("We have authorization")
@@ -34,6 +33,7 @@ struct ContentView: View {
                         // Still loading
                         let _ = print("Still loading")
                         LoadingView()
+                            // Task + await, because our getCurrentWeather method is async!
                             .task {
                                 do {
                                     weather = try await weatherManager.getCurrentWeather(latitude: location.latitude, longitude: location.longitude)
